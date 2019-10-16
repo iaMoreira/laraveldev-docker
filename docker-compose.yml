@@ -1,0 +1,39 @@
+version: "3.3"
+services:
+  webapp:
+    build:
+      dockerfile: ./docker/laravel.dockerfile
+      context: .
+    image: iamoreira/laravel
+    container_name: laravel
+    # volumes:
+    #   - /var/www/foo:/var/www/laravel
+    ports:
+      - "80:80"
+    depends_on:
+      - "db"
+
+  db:
+    build:
+      dockerfile: ./docker/laravelDev.dockerfile
+      context: .
+    image: mysql:5.7
+    # volumes:
+    #   - ${MYSQL_DATA_DIR-./data/mysql}:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpass
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 88:80
+    environment:
+      PMA_HOST: db:3306
+      MYSQL_ROOT_PASSWORD: myrootpass
+    depends_on:
+      - db
